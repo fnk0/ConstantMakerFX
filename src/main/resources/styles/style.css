@@ -1,0 +1,26 @@
+.btn {
+	-fx-background-color: #006064;
+	-fx-border-radius: 10;
+	-fx-background-radius: 10;
+	-fx-text-fill: #fafafa;
+	-fx-padding: 5;
+}
+
+.btn:hover {
+    -fx-background-color: #0097a7;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 5;
+}
+
+.btn:active {
+
+}
+
+.panel {
+    -fx-background-color: #f0f4c3;
+}
+
+.separator {
+    -fx-background-color: #006064;
+}
