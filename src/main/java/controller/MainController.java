@@ -1,11 +1,10 @@
 package controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -31,7 +30,7 @@ public class MainController implements Initializable {
     TextField value1, value2, value3, value4, value5, value7, value8, value9, value10, value11;
 
     @FXML
-    TextField contentType, outputLocation;
+    TextField contentType, outputLocation, fileName;
 
     @FXML
     Button btnMakeFile, btnSelFile;
@@ -45,9 +44,12 @@ public class MainController implements Initializable {
     @FXML
     Separator separatorTop, separatorMiddle;
 
-    private boolean boolIsPrivate = false;
-    private String output;
+    @FXML
+    ComboBox testBox;
 
+    private ObservableList<String> options = FXCollections.observableArrayList("Option 1", "Option 2", "Option 3");
+    private StringBuilder mBuilder = new StringBuilder();
+    private boolean boolIsPrivate = false;
     private ArrayList<TextField> mNameFields = new ArrayList<TextField>();
     private ArrayList<TextField> mValueFields = new ArrayList<TextField>();
     private FileWriter mOut = null;
@@ -57,8 +59,6 @@ public class MainController implements Initializable {
     public MainController() {
         mChooser = new DirectoryChooser();
         mChooser.setTitle("Select output location");
-
-        output = "";
     }
 
     public void initData(Stage stage) {
@@ -80,14 +80,40 @@ public class MainController implements Initializable {
         System.out.println("MakeFile");
         for(int i = 0; i < mNameFields.size(); i++) {
             if(!mNameFields.get(i).getText().isEmpty()) {
-                output += "public static final " + contentType.getText() + " " + mNameFields.get(i).getText() + " = \"" + mValueFields.get(i).getText() + "\";\n";
+                if(boolIsPrivate) {
+                    mBuilder.append("private ");
+                } else {
+                    mBuilder.append("public ");
+                }
+                mBuilder.append("static final ");
+                mBuilder.append(contentType.getText());
+                mBuilder.append(" ");
+                mBuilder.append(mNameFields.get(i).getText());
+                mBuilder.append(" = ");
+                if(contentType.getText().equals("String")) {
+                    mBuilder.append("\"");
+                }
+
+                mBuilder.append(mValueFields.get(i).getText());
+
+                if(contentType.getText().equals("String")) {
+                    mBuilder.append("\"");
+                } else if(contentType.getText().equals("long")) {
+                    mBuilder.append("L");
+                } else if(contentType.getText().equals("float")) {
+                    mBuilder.append("f");
+                } else if(contentType.getText().equals("double")) {
+                    mBuilder.append("d");
+                }
+                mBuilder.append(";\n");
             }
         }
+
         BufferedWriter mWriter = null;
         try {
-            mOut = new FileWriter(outputLocation.getText() + "/fileName.txt");
+            mOut = new FileWriter(outputLocation.getText() + "/" + fileName.getText() + ".txt");
             mWriter = new BufferedWriter(mOut);
-            mWriter.write(output);
+            mWriter.write(mBuilder.toString());
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -119,6 +145,7 @@ public class MainController implements Initializable {
         TextField[] values = {value1, value2, value3, value4, value5, value7, value8, value9, value10, value11};
         mNameFields.addAll(Arrays.asList(names));
         mValueFields.addAll(Arrays.asList(values));
+        testBox.setItems(options);
 
         btnMakeFile.getStyleClass().add("btn");
         btnSelFile.getStyleClass().add("btn");
